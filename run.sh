@@ -17,7 +17,7 @@ source "${PROJECT_ROOT}/scripts/virtualenv.sh"
 
 print_usage() {
   echo "Usage:"
-  echo "  $0 <name-of-device-from-inventory> [--no-lint] [-t <sub:tag:names>]..."
+  echo "  $0 <name-of-device-from-inventory> [-t <tag-name>]..."
   echo ""
   echo "Known devices are [ $(ls --color=never -m ${PROJECT_ROOT}/machines) ]"
   echo "Known task tags are: [ $(ansible-playbook --list-tags $PLAYBOOK 2> /dev/null | grep "TASK TAGS" | cut --delimiter="[" --field 2 | cut --delimiter="]"  --field=1) ]"
@@ -31,3 +31,10 @@ display_msg "Installing ${BOLD}base requirements${RESET} (like ansible itself) i
 pip install -r $PROJECT_ROOT/requirements_python.txt > /dev/null
 #install_python_requirements
 #install_ansible_requirements
+
+ansible-playbook \
+  --ask-become-pass \
+  --inventory machines/dev_machine \
+  --extra-vars user_name_from_env="$(id --user --name)" \
+  --extra-vars user_group_from_env="$(id --group --name)" \
+  playbook.yml
