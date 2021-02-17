@@ -13,6 +13,7 @@ ANSIBLE_CMD="ansible-playbook --ask-become-pass"
 
 source "${PROJECT_ROOT}/scripts/helper.sh"
 source "${PROJECT_ROOT}/scripts/virtualenv.sh"
+source "${PROJECT_ROOT}/scripts/requirements.sh"
 
 
 print_usage() {
@@ -29,12 +30,14 @@ setup_virtualenv
 
 display_msg "Installing ${BOLD}base requirements${RESET} (like ansible itself) in the virtual env"
 pip install -r $PROJECT_ROOT/requirements_python.txt > /dev/null
-#install_python_requirements
-#install_ansible_requirements
+install_python_requirements
+install_ansible_requirements
 
 ansible-playbook \
   --ask-become-pass \
   --inventory machines/dev_machine \
   --extra-vars user_name_from_env="$(id --user --name)" \
   --extra-vars user_group_from_env="$(id --group --name)" \
+  --extra-vars user_shell_from_env="$(echo $SHELL | sed -En 's/.*\/(\w*)/\1/p')" \
+  "$@" \
   playbook.yml
